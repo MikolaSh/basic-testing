@@ -1,5 +1,9 @@
 // Uncomment the code below and write your tests
-// import { readFileAsynchronously, doStuffByTimeout, doStuffByInterval } from '.';
+import {
+  doStuffByInterval,
+  // readFileAsynchronously,
+  doStuffByTimeout,
+} from '.';
 
 describe('doStuffByTimeout', () => {
   beforeAll(() => {
@@ -11,11 +15,32 @@ describe('doStuffByTimeout', () => {
   });
 
   test('should set timeout with provided callback and timeout', () => {
-    // Write your test here
+    const callback = jest.fn();
+    const timeout = 1000;
+    const timeoutSpy = jest.spyOn(global, 'setTimeout');
+
+    doStuffByTimeout(callback, timeout);
+
+    expect(timeoutSpy).toHaveBeenCalledTimes(1);
+    expect(timeoutSpy).toHaveBeenCalledWith(expect.any(Function), timeout);
+
+    timeoutSpy.mockRestore();
   });
 
   test('should call callback only after timeout', () => {
-    // Write your test here
+    const callback = jest.fn();
+    const timeout = 1000;
+
+    doStuffByTimeout(callback, timeout);
+
+    expect(callback).not.toHaveBeenCalled();
+
+    jest.advanceTimersByTime(timeout / 2);
+    expect(callback).not.toHaveBeenCalled();
+
+    jest.advanceTimersByTime(timeout / 2);
+
+    expect(callback).toHaveBeenCalledTimes(1);
   });
 });
 
@@ -29,11 +54,30 @@ describe('doStuffByInterval', () => {
   });
 
   test('should set interval with provided callback and timeout', () => {
-    // Write your test here
+    const callback = jest.fn();
+    const interval = 1000;
+
+    doStuffByInterval(callback, interval);
+
+    expect(jest.getTimerCount()).toBe(1);
+    jest.advanceTimersByTime(interval);
+
+    expect(callback).toHaveBeenCalledTimes(1);
   });
 
   test('should call callback multiple times after multiple intervals', () => {
-    // Write your test here
+    const callback = jest.fn();
+    const interval = 500;
+
+    doStuffByInterval(callback, interval);
+
+    jest.advanceTimersByTime(interval * 3);
+
+    expect(callback).toHaveBeenCalledTimes(3);
+
+    expect(callback).toHaveBeenNthCalledWith(1);
+    expect(callback).toHaveBeenNthCalledWith(2);
+    expect(callback).toHaveBeenNthCalledWith(3);
   });
 });
 
